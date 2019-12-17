@@ -43,7 +43,7 @@ namespace Hazebroek.Tgtg.Pickups
 
                 return stream.ReadAndDeserializeFromJson<AvailableFavoritesResponse>();
             }
-            catch (IOException _)
+            catch (IOException)
             {
                 return await Task.FromResult(new AvailableFavoritesResponse());
             }
