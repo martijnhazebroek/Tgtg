@@ -4,39 +4,33 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using Hazebroek.Tgtg.Auth;
-using Hazebroek.Tgtg.Infra;
 
 namespace Hazebroek.Tgtg.Notify
 {
-    public class TgtgNotifier
+    internal class TgtgNotifier
     {
         private readonly HttpClient _httpClient;
-        private readonly LoginContext _context;
-        private readonly UserStateRepository _userStateRepo;
 
         private readonly Dictionary<string, Collection<string>> _notificationSent =
             new Dictionary<string, Collection<string>>();
 
+        private readonly UserContextRepository _userContextRepo;
+
         public TgtgNotifier(
             HttpClient httpClient,
-            LoginContext context,
-            UserStateRepository userStateRepo
+            UserContextRepository userContextRepo
         )
         {
             _httpClient = httpClient;
-            _context = context;
-            _userStateRepo = userStateRepo;
+            _userContextRepo = userContextRepo;
         }
 
         public void Notify(string itemId, string store, int numberOfItems)
         {
-            _context.IftttTokens
+            _userContextRepo.CurrentContext.IftttTokens
                 .Where(token =>
                 {
-                    if (!_notificationSent.ContainsKey(token))
-                    {
-                        _notificationSent.Add(token, new Collection<string>());
-                    }
+                    if (!_notificationSent.ContainsKey(token)) _notificationSent.Add(token, new Collection<string>());
                     return !_notificationSent[token].Contains(itemId);
                 })
                 .ToList()
@@ -65,8 +59,8 @@ namespace Hazebroek.Tgtg.Notify
 
         public void RegisterTokens(IEnumerable<string> tokens)
         {
-            tokens.ToList().ForEach(_context.IftttTokens.Add);
-            _userStateRepo.SafeLoginContext();
+            tokens.ToList().ForEach(_userContextRepo.CurrentContext.IftttTokens.Add);
+            _userContextRepo.Persist();
         }
     }
 }

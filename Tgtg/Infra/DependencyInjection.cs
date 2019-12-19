@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Hazebroek.Tgtg.Auth;
+using Hazebroek.Tgtg.Flow;
 using Hazebroek.Tgtg.Notify;
 using Hazebroek.Tgtg.Pickups;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,10 +15,42 @@ namespace Hazebroek.Tgtg.Infra
         internal static ServiceProvider Init()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddScoped<TgtgClient>();
-            serviceCollection.AddScoped<UserStateRepository>();
-            serviceCollection.AddSingleton<LoginContext>();
 
+            RegisterUserContext(serviceCollection);
+            RegisterHttpClients(serviceCollection);
+            RegisterSteps(serviceCollection);
+            RegisterDebuggers(serviceCollection);
+            
+            return serviceCollection.BuildServiceProvider();
+        }
+
+        private static void RegisterDebuggers(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<Debugger>();
+        }
+
+        private static void RegisterSteps(IServiceCollection serviceCollection)
+        {
+            serviceCollection
+                .AddTransient<LoopInitiatorStep>()
+                .AddTransient<LoopUsersStep>()
+                .AddTransient<LoopKnownUserStep>()
+                .AddTransient<LoopNewUserStep>()
+                .AddTransient<AddNewUserStep>()
+                .AddTransient<RemoveUserStep>()
+                .AddTransient<AskEmailPasswordStep>()
+                .AddTransient<AskIftttTokensStep>()
+                .AddTransient<FetchFavoritesStep>()
+                .AddTransient<FetchFavoritesStep>()
+                .AddTransient<FetchReportNotifyLoopStep>()
+                .AddTransient<LoginStep>()
+                .AddTransient<NotifyUsersStep>()
+                .AddTransient<TryAutoLoginStep>()
+                .AddTransient<PrintUsersStep>();
+        }
+
+        private static void RegisterHttpClients(IServiceCollection serviceCollection)
+        {
             serviceCollection.AddHttpClient<PickupClient>(client =>
                 {
                     client.BaseAddress = new Uri("https://apptoogoodtogo.com/api/");
@@ -67,8 +100,14 @@ namespace Hazebroek.Tgtg.Infra
                 client.BaseAddress = new Uri("https://maker.ifttt.com/trigger/");
                 client.DefaultRequestHeaders.Clear();
             });
-                
-            return serviceCollection.BuildServiceProvider();
+        }
+
+        private static void RegisterUserContext(ServiceCollection serviceCollection)
+        {
+            serviceCollection
+                .AddScoped<UserContextRepository>()
+                .AddScoped<UserContext>()
+                .AddSingleton<UsersContextRepository>();
         }
     }
 }

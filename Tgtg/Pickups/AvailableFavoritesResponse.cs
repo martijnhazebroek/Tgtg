@@ -7,7 +7,6 @@ namespace Hazebroek.Tgtg.Pickups
     internal sealed class AvailableFavoritesResponse
     {
         [JsonProperty("items")] public ICollection<StoreItem> StoreItems { get; set; }
-
     }
 
     internal class StoreItem
@@ -18,7 +17,7 @@ namespace Hazebroek.Tgtg.Pickups
         [JsonProperty("sold_out_at")] public DateTime SoldOutAt { get; set; }
 
         public bool HasItems => ItemsAvailable > 0;
-        
+
         public override string ToString()
         {
             return

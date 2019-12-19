@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,25 +12,31 @@ namespace Hazebroek.Tgtg.Pickups
     internal sealed class PickupClient
     {
         private readonly HttpClient _httpClient;
-        private readonly LoginContext _loginContext;
+        private readonly UserContextRepository _userContextRepo;
 
-        public PickupClient(HttpClient httpClient, LoginContext loginContext)
+        public PickupClient(HttpClient httpClient, UserContextRepository userContextRepo)
         {
             _httpClient = httpClient;
-            _loginContext = loginContext;
+            _userContextRepo = userContextRepo;
         }
 
         public async Task<AvailableFavoritesResponse> FetchFavorites()
         {
+            var userContext = _userContextRepo.CurrentContext;
+            if (!userContext.UserId.HasValue)
+                throw new InvalidOperationException("UserId should not be null");
+            if (userContext.AccessToken == null)
+                throw new InvalidOperationException("AccessToken should not be null");
+            
             var request = new HttpRequestMessage(HttpMethod.Post, "item/v3/")
             {
                 Content = JsonResult.FromObject(new AvailableFavoritesRequest
                 {
-                    UserId = _loginContext.UserId
+                    UserId = userContext.UserId.Value
                 })
             };
 
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _loginContext.AccessToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", userContext.AccessToken);
 
             try
             {
