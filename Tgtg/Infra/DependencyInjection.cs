@@ -7,6 +7,8 @@ using Hazebroek.Tgtg.Flow;
 using Hazebroek.Tgtg.Notify;
 using Hazebroek.Tgtg.Pickups;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Hazebroek.Tgtg.Infra
 {
@@ -15,12 +17,16 @@ namespace Hazebroek.Tgtg.Infra
         internal static ServiceProvider Init()
         {
             var serviceCollection = new ServiceCollection();
-
+            serviceCollection.AddLogging(cfg =>
+                cfg.AddSerilog()
+                    .AddConsole()
+            );
+            
             RegisterUserContext(serviceCollection);
             RegisterHttpClients(serviceCollection);
             RegisterSteps(serviceCollection);
             RegisterDebuggers(serviceCollection);
-            
+
             return serviceCollection.BuildServiceProvider();
         }
 
@@ -37,7 +43,6 @@ namespace Hazebroek.Tgtg.Infra
                 .AddTransient<AddNewUserStep>()
                 .AddTransient<RemoveUserStep>()
                 .AddTransient<AskIftttTokensStep>()
-                .AddTransient<FetchFavoritesStep>()
                 .AddTransient<FetchFavoritesStep>()
                 .AddTransient<FetchReportNotifyLoopStep>()
                 .AddTransient<LoginStep>()

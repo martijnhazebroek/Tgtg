@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Hazebroek.Tgtg.Infra;
+using Microsoft.Extensions.Logging;
 
 namespace Hazebroek.Tgtg.Auth
 {
@@ -12,11 +13,17 @@ namespace Hazebroek.Tgtg.Auth
     {
         private readonly HttpClient _httpClient;
         private readonly UserContextRepository _userContextRepo;
+        private readonly ILogger<TokenClient> _logger;
 
-        public TokenClient(HttpClient httpClient, UserContextRepository userContextRepo)
+        public TokenClient(
+            HttpClient httpClient,
+            UserContextRepository userContextRepo,
+            ILogger<TokenClient> logger
+        )
         {
             _httpClient = httpClient;
             _userContextRepo = userContextRepo;
+            _logger = logger;
         }
 
         public async Task<RefreshTokenResponse> Refresh()
@@ -27,6 +34,8 @@ namespace Hazebroek.Tgtg.Auth
             if (userContext.AccessToken == null)
                 throw new InvalidOperationException("AccessToken should not be null");
 
+            _logger.LogInformation($"Refreshing tokens for {userContext.UserDisplayName}");
+            
             var request = new HttpRequestMessage(HttpMethod.Post, "api/auth/v1/token/refresh")
             {
                 Content = JsonResult.FromObject(new RefreshTokenRequest

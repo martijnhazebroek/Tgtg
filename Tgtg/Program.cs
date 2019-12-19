@@ -37,7 +37,10 @@ namespace Hazebroek.Tgtg
                 Console.CancelKeyPress += (sender, eventArgs) => cancelSource.Cancel();
 
                 var di = DependencyInjection.Init();
-
+                var logger = Logging.Init();
+                
+                logger.Information("Application started");
+                
                 if (addUserOpt.HasValue())
                     await di.GetRequiredService<AddNewUserStep>().Execute(cancelSource.Token);
                 else if (listUsersOpt.HasValue())

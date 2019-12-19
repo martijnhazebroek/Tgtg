@@ -27,7 +27,7 @@ namespace Hazebroek.Tgtg.Flow
                     var favorites = await _favoritesStep.Execute();
                     PrintAvailableFavoritesStep.Execute(favorites);
                     _notifyUsersStep.Execute(favorites);
-                    await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
+                    await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken);
                 }
             }, cancellationToken);
         }

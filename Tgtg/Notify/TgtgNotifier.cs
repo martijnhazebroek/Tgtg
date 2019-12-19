@@ -4,25 +4,27 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using Hazebroek.Tgtg.Auth;
+using Microsoft.Extensions.Logging;
 
 namespace Hazebroek.Tgtg.Notify
 {
     internal class TgtgNotifier
     {
         private readonly HttpClient _httpClient;
-
+        private readonly UserContextRepository _userContextRepo;
+        private readonly Logger<TgtgNotifier> _logger;
         private readonly Dictionary<string, Collection<string>> _notificationSent =
             new Dictionary<string, Collection<string>>();
 
-        private readonly UserContextRepository _userContextRepo;
-
         public TgtgNotifier(
             HttpClient httpClient,
-            UserContextRepository userContextRepo
+            UserContextRepository userContextRepo,
+            Logger<TgtgNotifier> logger
         )
         {
             _httpClient = httpClient;
             _userContextRepo = userContextRepo;
+            _logger = logger;
         }
 
         public void Notify(string itemId, string store, int numberOfItems)
@@ -52,6 +54,8 @@ namespace Hazebroek.Tgtg.Notify
 
                     var _ = await response.Content.ReadAsStreamAsync();
                     response.EnsureSuccessStatusCode();
+
+                    _logger.LogInformation($"Successfully sent push message for {_userContextRepo.CurrentContext.UserDisplayName}");
 
                     _notificationSent[token].Add(itemId);
                 });
