@@ -45,7 +45,7 @@ namespace Hazebroek.Tgtg
                 else if (removeUserOpt.HasValue())
                     di.GetRequiredService<RemoveUserStep>().Execute(cancelSource.Token);
                 else if (runOpt.HasValue())
-                    await di.GetRequiredService<LoopInitiatorStep>().Execute(di, cancelSource.Token);
+                    await LoopInitiatorStep.Execute(di, cancelSource.Token);
                 else if (debugOpt.HasValue())
                     di.GetRequiredService<Debugger>().Execute();
                 else 

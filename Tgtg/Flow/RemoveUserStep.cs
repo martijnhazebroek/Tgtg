@@ -1,4 +1,3 @@
-using System;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -28,7 +27,7 @@ namespace Hazebroek.Tgtg.Flow
             var email = Prompt.GetString("Email: ");
             Console.WriteLine();
 
-            UserContext user = _usersContextRepository
+            var user = _usersContextRepository
                 .FetchUsers()
                 .SingleOrDefault(u => u.Email == email);
 

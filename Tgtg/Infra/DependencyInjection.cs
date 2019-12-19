@@ -32,13 +32,10 @@ namespace Hazebroek.Tgtg.Infra
         private static void RegisterSteps(IServiceCollection serviceCollection)
         {
             serviceCollection
-                .AddTransient<LoopInitiatorStep>()
                 .AddTransient<LoopUsersStep>()
-                .AddTransient<LoopKnownUserStep>()
                 .AddTransient<LoopNewUserStep>()
                 .AddTransient<AddNewUserStep>()
                 .AddTransient<RemoveUserStep>()
-                .AddTransient<AskEmailPasswordStep>()
                 .AddTransient<AskIftttTokensStep>()
                 .AddTransient<FetchFavoritesStep>()
                 .AddTransient<FetchFavoritesStep>()
@@ -102,7 +99,7 @@ namespace Hazebroek.Tgtg.Infra
             });
         }
 
-        private static void RegisterUserContext(ServiceCollection serviceCollection)
+        private static void RegisterUserContext(IServiceCollection serviceCollection)
         {
             serviceCollection
                 .AddScoped<UserContextRepository>()

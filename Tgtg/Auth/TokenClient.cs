@@ -21,7 +21,7 @@ namespace Hazebroek.Tgtg.Auth
 
         public async Task<RefreshTokenResponse> Refresh()
         {
-            UserContext userContext = _userContextRepo.CurrentContext;
+            var userContext = _userContextRepo.CurrentContext;
             if (userContext.RefreshToken == null)
                 throw new InvalidOperationException("RefreshToken should not be null");
             if (userContext.AccessToken == null)

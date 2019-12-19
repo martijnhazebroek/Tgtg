@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Colorful;
 using Hazebroek.Tgtg.Auth;
 
@@ -12,7 +11,7 @@ namespace Hazebroek.Tgtg.Infra
             UsersContextRepository usersContextRepo
         )
         {
-            this._usersContextRepo = usersContextRepo;
+            _usersContextRepo = usersContextRepo;
         }
 
         public void Execute()

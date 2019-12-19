@@ -6,7 +6,7 @@ namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class AskEmailPasswordStep
     {
-        public Credentials Execute(LoginAttempt loginAttempt = null)
+        public static Credentials Execute(LoginAttempt loginAttempt = null)
         {
             string email = null;
             if (loginAttempt?.Email == null)

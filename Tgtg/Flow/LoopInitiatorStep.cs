@@ -8,7 +8,7 @@ namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class LoopInitiatorStep
     {
-        public async Task Execute(IServiceProvider serviceProvider, CancellationToken cancellationToken)
+        public static async Task Execute(IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
             var usersContextRepo = serviceProvider.GetRequiredService<UsersContextRepository>();
             if (usersContextRepo.TryRestore(out var usersContext))

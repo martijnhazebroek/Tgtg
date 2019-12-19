@@ -28,8 +28,7 @@ namespace Hazebroek.Tgtg.Flow
                 }
                 else
                 {
-                    var loopKnownUserStep = serviceProvider.GetService<LoopKnownUserStep>();
-                    _tasks.Add(loopKnownUserStep.Execute(userId, serviceProvider, cancellationToken));
+                    _tasks.Add(LoopKnownUserStep.Execute(userId, serviceProvider, cancellationToken));
                 }
             }
             await Task.WhenAll(_tasks);

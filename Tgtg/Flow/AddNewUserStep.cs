@@ -7,17 +7,14 @@ namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class AddNewUserStep
     {
-        private readonly AskEmailPasswordStep _askEmailPasswordStep;
         private readonly AskIftttTokensStep _askIftttTokensStep;
         private readonly LoginStep _loginStep;
 
         public AddNewUserStep(
-            AskEmailPasswordStep askEmailPasswordStep,
             LoginStep loginStep,
             AskIftttTokensStep askIftttTokensStep
         )
         {
-            _askEmailPasswordStep = askEmailPasswordStep;
             _loginStep = loginStep;
             _askIftttTokensStep = askIftttTokensStep;
         }
@@ -26,7 +23,7 @@ namespace Hazebroek.Tgtg.Flow
         {
             if (cancellationToken.IsCancellationRequested) return;
 
-            var credentials = _askEmailPasswordStep.Execute();
+            var credentials = AskEmailPasswordStep.Execute();
             var loginAttempt = await _loginStep.Execute(credentials);
             
             _askIftttTokensStep.Execute();
