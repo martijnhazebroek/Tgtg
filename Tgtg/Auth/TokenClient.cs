@@ -77,7 +77,6 @@ namespace Hazebroek.Tgtg.Auth
             _userContextRepo.CurrentContext.AccessToken = result.AccessToken;
             _userContextRepo.CurrentContext.RefreshToken = result.RefreshToken;
             _userContextRepo.CurrentContext.UserId = result.UserId;
-            await _userContextRepo.Persist();
 
             return result;
         }
