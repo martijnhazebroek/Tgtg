@@ -15,7 +15,7 @@ namespace Hazebroek.Tgtg
 
             var app = new CommandLineApplication
             {
-                Name = "tgtg",
+                Name = "Tgtg",
                 Description = "Tools voor het platform To Good To Go."
             };
 
@@ -37,6 +37,7 @@ namespace Hazebroek.Tgtg
                 Console.CancelKeyPress += (sender, eventArgs) => cancelSource.Cancel();
 
                 var di = DependencyInjection.Init();
+
                 if (addUserOpt.HasValue())
                     await di.GetRequiredService<AddNewUserStep>().Execute(cancelSource.Token);
                 else if (listUsersOpt.HasValue())
@@ -47,7 +48,9 @@ namespace Hazebroek.Tgtg
                     await di.GetRequiredService<LoopInitiatorStep>().Execute(di, cancelSource.Token);
                 else if (debugOpt.HasValue())
                     di.GetRequiredService<Debugger>().Execute();
-
+                else 
+                    app.ShowHelp();
+                
                 return 0;
             });
 
