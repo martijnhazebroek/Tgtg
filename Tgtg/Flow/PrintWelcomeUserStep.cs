@@ -1,13 +1,21 @@
 using System.Drawing;
 using Colorful;
+using Hazebroek.Tgtg.Infra;
 
 namespace Hazebroek.Tgtg.Flow
 {
-    internal static class PrintWelcomeUserStep
+    internal class PrintWelcomeUserStep
     {
-        public static void Execute(string displayName)
+        private readonly ConsolePrinter _console;
+
+        public PrintWelcomeUserStep(ConsolePrinter console)
         {
-            Console.WriteLineFormatted(
+            _console = console;
+        }
+
+        public void Execute(string displayName)
+        {
+            _console.WriteLineFormatted(
                 "Welkom {0}!",
                 Color.Aqua,
                 new Formatter(displayName, Color.LawnGreen)

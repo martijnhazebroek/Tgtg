@@ -5,7 +5,6 @@ using Hazebroek.Tgtg.Infra;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Console = Colorful.Console;
 
 namespace Hazebroek.Tgtg
 {
@@ -22,7 +21,7 @@ namespace Hazebroek.Tgtg
         {
             _logger.LogInformation("Application started");
 
-            PrintBannerStep.Execute();
+            di.GetRequiredService<PrintBannerStep>().Execute();
 
             var app = new CommandLineApplication
             {

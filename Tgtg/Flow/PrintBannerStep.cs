@@ -1,13 +1,21 @@
 using System.Drawing;
 using Colorful;
+using Hazebroek.Tgtg.Infra;
 
 namespace Hazebroek.Tgtg.Flow
 {
-    internal static class PrintBannerStep
+    internal class PrintBannerStep
     {
-        public static void Execute()
+        private readonly ConsolePrinter _console;
+
+        public PrintBannerStep(ConsolePrinter console)
         {
-            Console.Write(@"                                                                           
+            _console = console;
+        }
+
+        public void Execute()
+        {
+            _console.Write(@"                                                                           
                                                                                                         
                               `..---..`                                
                            `-------------`                             
@@ -37,9 +45,9 @@ namespace Hazebroek.Tgtg.Flow
                         `.-:/+++++++++/-`                              
                               ```````");
 
-            Console.WriteLine();
-            Console.WriteLine("Too Good To Go", Color.Aqua);
-            Console.WriteLine();
+            _console.WriteLine();
+            _console.WriteLine("Too Good To Go", Color.Aqua);
+            _console.WriteLine();
         }
     }
 }

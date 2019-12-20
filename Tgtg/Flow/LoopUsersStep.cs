@@ -11,14 +11,20 @@ namespace Hazebroek.Tgtg.Flow
     {
         private readonly List<Task> _tasks;
         private readonly PrintUserCouldNotAutoLoginStep _printUserCouldNotAutoLoginStep;
+        private readonly LoopKnownUserStep _loopKnownUserStep;
 
-        public LoopUsersStep(PrintUserCouldNotAutoLoginStep printUserCouldNotAutoLoginStep)
+        public LoopUsersStep(
+            PrintUserCouldNotAutoLoginStep printUserCouldNotAutoLoginStep,
+            LoopKnownUserStep loopKnownUserStep
+        )
         {
             _tasks = new List<Task>();
             _printUserCouldNotAutoLoginStep = printUserCouldNotAutoLoginStep;
+            _loopKnownUserStep = loopKnownUserStep;
         }
-        
-        public async Task Execute(IEnumerable<long> userIds, IServiceProvider serviceProvider, CancellationToken cancellationToken)
+
+        public async Task Execute(IEnumerable<long> userIds, IServiceProvider serviceProvider,
+            CancellationToken cancellationToken)
         {
             foreach (var userId in userIds)
             {
@@ -30,9 +36,10 @@ namespace Hazebroek.Tgtg.Flow
                 }
                 else
                 {
-                    _tasks.Add(LoopKnownUserStep.Execute(userId, serviceProvider, cancellationToken));
+                    _tasks.Add(_loopKnownUserStep.Execute(userId, serviceProvider, cancellationToken));
                 }
             }
+
             await Task.WhenAll(_tasks);
         }
     }

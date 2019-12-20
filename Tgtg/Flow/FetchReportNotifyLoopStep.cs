@@ -8,12 +8,15 @@ namespace Hazebroek.Tgtg.Flow
     {
         private readonly FetchFavoritesStep _favoritesStep;
         private readonly NotifyUsersStep _notifyUsersStep;
+        private readonly PrintAvailableFavoritesStep _printAvailableFavoritesStep;
 
         public FetchReportNotifyLoopStep(
+            PrintAvailableFavoritesStep printAvailableFavoritesStep,
             FetchFavoritesStep favoritesStep,
             NotifyUsersStep notifyUsersStep
         )
         {
+            _printAvailableFavoritesStep = printAvailableFavoritesStep;
             _favoritesStep = favoritesStep;
             _notifyUsersStep = notifyUsersStep;
         }
@@ -25,7 +28,7 @@ namespace Hazebroek.Tgtg.Flow
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var favorites = await _favoritesStep.Execute();
-                    PrintAvailableFavoritesStep.Execute(favorites);
+                    _printAvailableFavoritesStep.Execute(favorites);
                     _notifyUsersStep.Execute(favorites);
                     await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken);
                 }

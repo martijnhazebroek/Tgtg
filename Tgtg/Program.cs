@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -46,11 +47,21 @@ namespace Hazebroek.Tgtg
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
+                    if (isWorker)
+                    {
+                        services.AddTransient<ConsolePrinter, WorkerConsolePrinter>();
+                    }
+                    else
+                    {
+                        services.AddTransient<ConsolePrinter, CliConsolePrinter>();
+                    }
+                    
                     services
                         .AddTransient<TgtgCli>()
                         .AddTransient<LoopInitiatorStep>()
                         .AddTransient<LoopUsersStep>()
                         .AddTransient<LoopNewUserStep>()
+                        .AddTransient<LoopKnownUserStep>()
                         .AddTransient<AddNewUserStep>()
                         .AddTransient<RemoveUserStep>()
                         .AddTransient<AskIftttTokensStep>()
@@ -59,13 +70,16 @@ namespace Hazebroek.Tgtg
                         .AddTransient<LoginStep>()
                         .AddTransient<NotifyUsersStep>()
                         .AddTransient<TryAutoLoginStep>()
+                        .AddTransient<PrintBannerStep>()
                         .AddTransient<PrintUsersStep>()
+                        .AddTransient<PrintAvailableFavoritesStep>()
                         .AddTransient<PrintUserCouldNotAutoLoginStep>()
                         .AddTransient<PrintDebugStep>()
+                        .AddTransient<PrintWelcomeUserStep>()
                         .AddScoped<UserContextRepository>()
                         .AddScoped<UserContext>()
                         .AddScoped<UsersContextRepository>();
-
+                    
                     services.AddHttpClient<PickupClient>(client =>
                         {
                             client.BaseAddress = new Uri("https://apptoogoodtogo.com/api/");

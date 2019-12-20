@@ -8,7 +8,14 @@ namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class LoopKnownUserStep
     {
-        public static async Task Execute(long userId, IServiceProvider serviceProvider, CancellationToken cancellationToken)
+        private readonly PrintWelcomeUserStep _printWelcomeUserStep;
+
+        public LoopKnownUserStep(PrintWelcomeUserStep printWelcomeUserStep)
+        {
+            _printWelcomeUserStep = printWelcomeUserStep;
+        }
+        
+        public async Task Execute(long userId, IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
             using var scope = serviceProvider.CreateScope();
             var autoLoginStep = scope.ServiceProvider.GetRequiredService<TryAutoLoginStep>();
@@ -22,7 +29,7 @@ namespace Hazebroek.Tgtg.Flow
                 loginAttempt = await loginStep.Execute(credentials);
             }
 
-            PrintWelcomeUserStep.Execute(loginAttempt.UserDisplayName);
+            _printWelcomeUserStep.Execute(loginAttempt.UserDisplayName);
 
             await fetchReportNotifyLoopStep.Execute(cancellationToken);
         }
