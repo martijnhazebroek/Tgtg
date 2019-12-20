@@ -59,9 +59,9 @@ namespace Hazebroek.Tgtg.Pickups
 
                 return stream.ReadAndDeserializeFromJson<AvailableFavoritesResponse>();
             }
-            catch (IOException)
+            catch (HttpRequestException ex)
             {
-                _logger.LogInformation($"Error while fetching favorites for {userContext.UserDisplayName}");
+                _logger.LogError($"Error while fetching favorites for {userContext.UserDisplayName}", ex.Message, ex);
 
                 return await Task.FromResult(new AvailableFavoritesResponse());
             }

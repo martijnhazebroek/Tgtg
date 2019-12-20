@@ -12,7 +12,7 @@ namespace Hazebroek.Tgtg.Infra
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (!stream.CanRead) throw new NotSupportedException("Can't read from this stream.");
 
-            using var streamReader = new StreamReader(stream, Encoding.UTF8, true, 1024, false);
+            using var streamReader = new StreamReader(stream, Encoding.UTF8, true, 2048, false);
             using var jsonTextReader = new JsonTextReader(streamReader);
             var jsonSerializer = new JsonSerializer();
             return jsonSerializer.Deserialize<T>(jsonTextReader);

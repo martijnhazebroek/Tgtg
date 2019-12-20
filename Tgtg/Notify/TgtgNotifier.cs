@@ -55,7 +55,7 @@ namespace Hazebroek.Tgtg.Notify
                     var _ = await response.Content.ReadAsStreamAsync();
                     response.EnsureSuccessStatusCode();
 
-                    _logger.LogInformation($"Successfully sent push message for {_userContextRepo.CurrentContext.UserDisplayName}");
+                    _logger.LogInformation($"Successfully sent push message for {_userContextRepo.CurrentContext.UserDisplayName} regarding {store}");
 
                     _notificationSent[token].Add(itemId);
                 });
