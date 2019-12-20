@@ -52,9 +52,8 @@ namespace Hazebroek.Tgtg.Pickups
                     );
 
                 var stream = await response.Content.ReadAsStreamAsync();
+                _logger.LogInformation($"Fetched favorites: {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
-
-                _logger.LogInformation($"Successfully fetched favorites for {userContext.UserDisplayName}");
 
                 return stream.ReadAndDeserializeFromJson<AvailableFavoritesResponse>();
             }
