@@ -60,7 +60,7 @@ namespace Hazebroek.Tgtg.Pickups
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError($"Error while fetching favorites for {userContext.UserDisplayName}", ex.Message, ex);
+                _logger.LogError(ex, $"Error while fetching favorites for {userContext.UserDisplayName}");
 
                 return await Task.FromResult(new AvailableFavoritesResponse());
             }
