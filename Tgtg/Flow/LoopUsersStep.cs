@@ -7,13 +7,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Hazebroek.Tgtg.Flow
 {
-    public class LoopUsersStep
+    internal class LoopUsersStep
     {
         private readonly List<Task> _tasks;
+        private readonly PrintUserCouldNotAutoLoginStep _printUserCouldNotAutoLoginStep;
 
-        public LoopUsersStep()
+        public LoopUsersStep(PrintUserCouldNotAutoLoginStep printUserCouldNotAutoLoginStep)
         {
             _tasks = new List<Task>();
+            _printUserCouldNotAutoLoginStep = printUserCouldNotAutoLoginStep;
         }
         
         public async Task Execute(IEnumerable<long> userIds, IServiceProvider serviceProvider, CancellationToken cancellationToken)
@@ -24,7 +26,7 @@ namespace Hazebroek.Tgtg.Flow
                 var attempt = await tryAutoLoginStep.Execute(userId);
                 if (attempt.Status == LoginStatus.Reauthenticate)
                 {
-                    PrintUserCouldNotAutologin.Execute(attempt);
+                    _printUserCouldNotAutoLoginStep.Execute(attempt);
                 }
                 else
                 {

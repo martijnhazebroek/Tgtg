@@ -12,14 +12,14 @@ namespace Hazebroek.Tgtg.Notify
     {
         private readonly HttpClient _httpClient;
         private readonly UserContextRepository _userContextRepo;
-        private readonly Logger<TgtgNotifier> _logger;
+        private readonly ILogger<TgtgNotifier> _logger;
         private readonly Dictionary<string, Collection<string>> _notificationSent =
             new Dictionary<string, Collection<string>>();
 
         public TgtgNotifier(
             HttpClient httpClient,
             UserContextRepository userContextRepo,
-            Logger<TgtgNotifier> logger
+            ILogger<TgtgNotifier> logger
         )
         {
             _httpClient = httpClient;

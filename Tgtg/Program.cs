@@ -1,63 +1,131 @@
 ﻿using System;
-using System.Threading;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Hazebroek.Tgtg.Auth;
 using Hazebroek.Tgtg.Flow;
 using Hazebroek.Tgtg.Infra;
-using McMaster.Extensions.CommandLineUtils;
+using Hazebroek.Tgtg.Notify;
+using Hazebroek.Tgtg.Pickups;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Hazebroek.Tgtg
 {
     internal class Program
     {
+        private static ServiceProvider _serviceProvider;
+
         private static int Main(string[] args)
         {
-            PrintBannerStep.Execute();
+            bool isWorker = args.Contains("--worker");
 
-            var app = new CommandLineApplication
+            var builder = CreateHostBuilder(args, isWorker);
+            if (isWorker)
             {
-                Name = "Tgtg",
-                Description = "Tools voor het platform To Good To Go."
-            };
-
-            app.HelpOption();
-            var addUserOpt = app.Option(
-                "-a |--add", "Voeg gebruiker toe", CommandOptionType.NoValue);
-            var runOpt = app.Option(
-                "-r |--run", "Start de applicatie", CommandOptionType.NoValue);
-            var listUsersOpt = app.Option(
-                "-l |--list", "Print gebruikers", CommandOptionType.NoValue);
-            var removeUserOpt = app.Option(
-                "--remove", "Verwijder een gebruiker", CommandOptionType.NoValue);
-            var debugOpt = app.Option(
-                "-d |--debug", "Toon debug informatie", CommandOptionType.NoValue);
-
-            app.OnExecuteAsync(async cancelToken =>
+                builder.Build().Run();
+            }
+            else
             {
-                var cancelSource = new CancellationTokenSource();
-                Console.CancelKeyPress += (sender, eventArgs) => cancelSource.Cancel();
+                builder.RunConsoleAsync();
+                var cli = _serviceProvider.GetRequiredService<TgtgCli>();
+                return cli.Execute(_serviceProvider, args);
+            }
 
-                var di = DependencyInjection.Init();
-                var logger = Logging.Init();
-                
-                logger.Information("Application started");
-                
-                if (addUserOpt.HasValue())
-                    await di.GetRequiredService<AddNewUserStep>().Execute(cancelSource.Token);
-                else if (listUsersOpt.HasValue())
-                    di.GetRequiredService<PrintUsersStep>().Execute(cancelSource.Token);
-                else if (removeUserOpt.HasValue())
-                    di.GetRequiredService<RemoveUserStep>().Execute(cancelSource.Token);
-                else if (runOpt.HasValue())
-                    await LoopInitiatorStep.Execute(di, cancelSource.Token);
-                else if (debugOpt.HasValue())
-                    di.GetRequiredService<Debugger>().Execute();
-                else 
-                    app.ShowHelp();
-                
-                return 0;
-            });
-
-            return app.Execute(args);
+            return 0;
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args, bool isWorker) =>
+            Host.CreateDefaultBuilder(args)
+                .UseSystemd()
+                .ConfigureLogging(logging =>
+                {
+                    if (!isWorker) logging.ClearProviders();
+                })
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services
+                        .AddTransient<TgtgCli>()
+                        .AddTransient<LoopInitiatorStep>()
+                        .AddTransient<LoopUsersStep>()
+                        .AddTransient<LoopNewUserStep>()
+                        .AddTransient<AddNewUserStep>()
+                        .AddTransient<RemoveUserStep>()
+                        .AddTransient<AskIftttTokensStep>()
+                        .AddTransient<FetchFavoritesStep>()
+                        .AddTransient<FetchReportNotifyLoopStep>()
+                        .AddTransient<LoginStep>()
+                        .AddTransient<NotifyUsersStep>()
+                        .AddTransient<TryAutoLoginStep>()
+                        .AddTransient<PrintUsersStep>()
+                        .AddTransient<PrintUserCouldNotAutoLoginStep>()
+                        .AddTransient<PrintDebugStep>()
+                        .AddScoped<UserContextRepository>()
+                        .AddScoped<UserContext>()
+                        .AddScoped<UsersContextRepository>();
+
+                    services.AddHttpClient<PickupClient>(client =>
+                        {
+                            client.BaseAddress = new Uri("https://apptoogoodtogo.com/api/");
+                            client.DefaultRequestHeaders.Clear();
+                            client.DefaultRequestHeaders.AcceptLanguage.Add(
+                                new StringWithQualityHeaderValue("nl-NL")
+                            );
+                            client.DefaultRequestHeaders.UserAgent.Add(
+                                ProductInfoHeaderValue.Parse("TGTG/19.10.4")
+                            );
+                            client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                        })
+                        .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+                        {
+                            var handler = new HttpClientHandler
+                            {
+                                AutomaticDecompression = DecompressionMethods.GZip,
+                                UseProxy = true
+                            };
+                            return handler;
+                        });
+
+                    services.AddHttpClient<TokenClient>(client =>
+                        {
+                            client.BaseAddress = new Uri("https://apptoogoodtogo.com/");
+                            client.DefaultRequestHeaders.Clear();
+                            client.DefaultRequestHeaders.AcceptLanguage.Add(
+                                new StringWithQualityHeaderValue("nl-NL")
+                            );
+                            client.DefaultRequestHeaders.UserAgent.Add(
+                                ProductInfoHeaderValue.Parse("TGTG/19.10.4")
+                            );
+                            client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                        })
+                        .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+                        {
+                            var handler = new HttpClientHandler
+                            {
+                                AutomaticDecompression = DecompressionMethods.GZip,
+                                UseProxy = true
+                            };
+                            return handler;
+                        });
+
+                    services.AddHttpClient<TgtgNotifier>(client =>
+                    {
+                        client.BaseAddress = new Uri("https://maker.ifttt.com/trigger/");
+                        client.DefaultRequestHeaders.Clear();
+                    });
+
+                    if (isWorker)
+                    {
+                        services.AddHostedService(factory =>
+                            new Worker(services.BuildServiceProvider())
+                        );
+                    }
+                    else
+                    {
+                        _serviceProvider = services.BuildServiceProvider();
+                    }
+                });
     }
 }

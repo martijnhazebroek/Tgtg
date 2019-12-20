@@ -3,11 +3,11 @@ using Hazebroek.Tgtg.Auth;
 
 namespace Hazebroek.Tgtg.Infra
 {
-    internal sealed class Debugger
+    internal sealed class PrintDebugStep
     {
         private readonly UsersContextRepository _usersContextRepo;
 
-        public Debugger(
+        public PrintDebugStep(
             UsersContextRepository usersContextRepo
         )
         {
