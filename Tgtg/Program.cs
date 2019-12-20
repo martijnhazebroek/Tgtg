@@ -20,37 +20,43 @@ namespace Hazebroek.Tgtg
 
         private static int Main(string[] args)
         {
-            var isWorker = args.Contains("--worker");
+            ExecutionContext executionContext = args.Contains("--worker") 
+                ? (ExecutionContext)new WorkerExecutionContext() 
+                : new CliExecutionContext();
 
-            var builder = CreateHostBuilder(args, isWorker);
-            if (isWorker)
-            {
-                builder.Build().Run();
-            }
-            else
+            var builder = CreateHostBuilder(args, executionContext);
+            if (executionContext.HasPrompt)
             {
                 builder.RunConsoleAsync();
                 var cli = _serviceProvider.GetRequiredService<TgtgCli>();
                 return cli.Execute(_serviceProvider!, args);
             }
 
+            builder.Build().Run();
+
             return 0;
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args, bool isWorker)
+        public static IHostBuilder CreateHostBuilder(string[] args, ExecutionContext executionContext)
         {
             return Host.CreateDefaultBuilder(args)
                 .UseSystemd()
                 .ConfigureLogging(logging =>
                 {
-                    if (!isWorker) logging.ClearProviders();
+                    if (executionContext.HasPrompt) logging.ClearProviders();
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    if (isWorker)
-                        services.AddTransient<ConsolePrinter, WorkerConsolePrinter>();
-                    else
+                    if (executionContext.HasPrompt)
+                    {
                         services.AddTransient<ConsolePrinter, CliConsolePrinter>();
+                        services.AddSingleton(executionContext);
+                    }
+                    else
+                    {
+                        services.AddTransient<ConsolePrinter, WorkerConsolePrinter>();
+                        services.AddSingleton(executionContext);
+                    }
 
                     services
                         .AddTransient<TgtgCli>()
@@ -127,7 +133,7 @@ namespace Hazebroek.Tgtg
                         client.DefaultRequestHeaders.Clear();
                     });
 
-                    if (isWorker)
+                    if (!executionContext.HasPrompt)
                         services.AddHostedService(factory =>
                             new Worker(services.BuildServiceProvider())
                         );
