@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -17,11 +16,11 @@ namespace Hazebroek.Tgtg
 {
     internal class Program
     {
-        private static ServiceProvider _serviceProvider;
+        private static ServiceProvider? _serviceProvider;
 
         private static int Main(string[] args)
         {
-            bool isWorker = args.Contains("--worker");
+            var isWorker = args.Contains("--worker");
 
             var builder = CreateHostBuilder(args, isWorker);
             if (isWorker)
@@ -32,14 +31,15 @@ namespace Hazebroek.Tgtg
             {
                 builder.RunConsoleAsync();
                 var cli = _serviceProvider.GetRequiredService<TgtgCli>();
-                return cli.Execute(_serviceProvider, args);
+                return cli.Execute(_serviceProvider!, args);
             }
 
             return 0;
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args, bool isWorker) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args, bool isWorker)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .UseSystemd()
                 .ConfigureLogging(logging =>
                 {
@@ -48,20 +48,17 @@ namespace Hazebroek.Tgtg
                 .ConfigureServices((hostContext, services) =>
                 {
                     if (isWorker)
-                    {
                         services.AddTransient<ConsolePrinter, WorkerConsolePrinter>();
-                    }
                     else
-                    {
                         services.AddTransient<ConsolePrinter, CliConsolePrinter>();
-                    }
-                    
+
                     services
                         .AddTransient<TgtgCli>()
                         .AddTransient<LoopInitiatorStep>()
                         .AddTransient<LoopUsersStep>()
                         .AddTransient<LoopNewUserStep>()
                         .AddTransient<LoopKnownUserStep>()
+                        .AddTransient<AskEmailPasswordStep>()
                         .AddTransient<AddNewUserStep>()
                         .AddTransient<RemoveUserStep>()
                         .AddTransient<AskIftttTokensStep>()
@@ -79,7 +76,7 @@ namespace Hazebroek.Tgtg
                         .AddScoped<UserContextRepository>()
                         .AddScoped<UserContext>()
                         .AddScoped<UsersContextRepository>();
-                    
+
                     services.AddHttpClient<PickupClient>(client =>
                         {
                             client.BaseAddress = new Uri("https://apptoogoodtogo.com/api/");
@@ -131,15 +128,12 @@ namespace Hazebroek.Tgtg
                     });
 
                     if (isWorker)
-                    {
                         services.AddHostedService(factory =>
                             new Worker(services.BuildServiceProvider())
                         );
-                    }
                     else
-                    {
                         _serviceProvider = services.BuildServiceProvider();
-                    }
                 });
+        }
     }
 }

@@ -18,7 +18,10 @@ namespace Hazebroek.Tgtg.Flow
             favorites.StoreItems
                 .Where(si => si.HasItems)
                 .ToList()
-                .ForEach(si => { _notifier.Notify(si.Item.Id, si.Store.Name, si.ItemsAvailable); });
+                .ForEach(si =>
+                {
+                    _notifier.Notify(si.Item!.Id!, si.Store!.Name!, si.ItemsAvailable);
+                });
         }
     }
 }

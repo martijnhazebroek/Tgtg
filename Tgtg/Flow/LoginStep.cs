@@ -26,7 +26,7 @@ namespace Hazebroek.Tgtg.Flow
             // TODO fix failed login scenario
             _usersContextRepository.AddUser(response.UserId);
             await _userContextRepo.Persist();
-            return LoginAttempt.KnownUser(credentials.Email, response.DisplayName);
+            return LoginAttempt.KnownUser(credentials.Email!, response.DisplayName!);
         }
     }
 }

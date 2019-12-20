@@ -20,12 +20,14 @@ namespace Hazebroek.Tgtg.Flow
         public async Task<LoginAttempt> Execute(long userId)
         {
             var userStateRestored = _userContextRepo.TryRestore(userId, out var restored);
-            if (!userStateRestored) return LoginAttempt.UserHasToAuthenticate(restored.UserDisplayName);
+            if (!userStateRestored || restored == null) 
+                return LoginAttempt.UserHasToAuthenticate(restored?.UserDisplayName!);
 
             var refresh = await _tokenClient.Refresh();
-            if (!refresh.IsSuccess) return LoginAttempt.UserHasToAuthenticate(restored.UserDisplayName);
+            if (!refresh.IsSuccess) return LoginAttempt.UserHasToAuthenticate(restored.UserDisplayName!);
             await _userContextRepo.Persist();
-            return LoginAttempt.KnownUser(restored.Email, restored.UserDisplayName);
+            
+            return LoginAttempt.KnownUser(restored.Email!, restored.UserDisplayName!);
         }
     }
 }

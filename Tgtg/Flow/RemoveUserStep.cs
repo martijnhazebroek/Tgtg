@@ -3,38 +3,43 @@ using System.Linq;
 using System.Threading;
 using Colorful;
 using Hazebroek.Tgtg.Auth;
+using Hazebroek.Tgtg.Infra;
 using McMaster.Extensions.CommandLineUtils;
-using Console = Colorful.Console;
 
 namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class RemoveUserStep
     {
         private readonly UsersContextRepository _usersContextRepository;
+        private readonly ConsolePrinter _console;
 
         public RemoveUserStep(
-            UsersContextRepository usersContextRepository
+            UsersContextRepository usersContextRepository,
+            ConsolePrinter console
         )
         {
             _usersContextRepository = usersContextRepository;
+            _console = console;
         }
 
         public void Execute(CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested) return;
 
-            Console.WriteLine("Gebruiker verwijderen.");
+            _console.WriteLine("Gebruiker verwijderen.");
             var email = Prompt.GetString("Email: ");
-            Console.WriteLine();
+            _console.WriteLine();
 
+            if (email == null) return;
+            
             var user = _usersContextRepository
                 .FetchUsers()
-                .SingleOrDefault(u => u.Email == email);
+                .SingleOrDefault(u => u.Email! == email);
 
             if (user?.UserId != null)
             {
                 _usersContextRepository.Remove(user.UserId.Value);
-                PrintUserRemoved(user.UserDisplayName);
+                PrintUserRemoved(user.UserDisplayName!);
             }
             else
             {
@@ -42,18 +47,18 @@ namespace Hazebroek.Tgtg.Flow
             }
         }
 
-        private static void PrintUserCouldNotBeRemoved(string email)
+        private void PrintUserCouldNotBeRemoved(string email)
         {
-            Console.WriteLineFormatted(
+            _console.WriteLineFormatted(
                 "{0} kon niet worden verwijderd.",
                 Color.Aqua,
                 new Formatter(email, Color.Red)
             );
         }
 
-        private static void PrintUserRemoved(string displayName)
+        private void PrintUserRemoved(string displayName)
         {
-            Console.WriteLineFormatted(
+            _console.WriteLineFormatted(
                 "{0} is verwijderd.",
                 Color.Aqua,
                 new Formatter(displayName, Color.LawnGreen)

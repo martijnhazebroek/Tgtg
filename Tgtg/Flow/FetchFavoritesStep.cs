@@ -12,6 +12,9 @@ namespace Hazebroek.Tgtg.Flow
             _pickupClient = pickupClient;
         }
 
-        public async Task<AvailableFavoritesResponse> Execute() => await _pickupClient.FetchFavorites();
+        public async Task<AvailableFavoritesResponse> Execute()
+        {
+            return await _pickupClient.FetchFavorites();
+        }
     }
 }

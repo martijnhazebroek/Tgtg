@@ -11,10 +11,12 @@ namespace Hazebroek.Tgtg.Notify
     internal class TgtgNotifier
     {
         private readonly HttpClient _httpClient;
-        private readonly UserContextRepository _userContextRepo;
         private readonly ILogger<TgtgNotifier> _logger;
+
         private readonly Dictionary<string, Collection<string>> _notificationSent =
             new Dictionary<string, Collection<string>>();
+
+        private readonly UserContextRepository _userContextRepo;
 
         public TgtgNotifier(
             HttpClient httpClient,
@@ -55,7 +57,8 @@ namespace Hazebroek.Tgtg.Notify
                     var _ = await response.Content.ReadAsStreamAsync();
                     response.EnsureSuccessStatusCode();
 
-                    _logger.LogInformation($"Successfully sent push message for {_userContextRepo.CurrentContext.UserDisplayName} regarding {store}");
+                    _logger.LogInformation(
+                        $"Successfully sent push message for {_userContextRepo.CurrentContext.UserDisplayName} regarding {store}");
 
                     _notificationSent[token].Add(itemId);
                 });

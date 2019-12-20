@@ -8,12 +8,9 @@ namespace Hazebroek.Tgtg.Infra
 {
     internal static class JsonResult
     {
-        public static HttpContent FromObject(object json)
-        {
-            return CreateHttpContent(json);
-        }
+        public static HttpContent? FromObject(object json) => CreateHttpContent(json);
 
-        private static HttpContent CreateHttpContent(object content)
+        private static HttpContent? CreateHttpContent(object content)
         {
             if (content == null) return null;
             var ms = new MemoryStream();

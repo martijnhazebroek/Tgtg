@@ -1,23 +1,29 @@
-using Colorful;
 using Hazebroek.Tgtg.Auth;
+using Hazebroek.Tgtg.Infra;
 using McMaster.Extensions.CommandLineUtils;
 
 namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class AskEmailPasswordStep
     {
-        public static Credentials Execute(LoginAttempt loginAttempt = null)
+        private readonly ConsolePrinter _console;
+        public AskEmailPasswordStep(ConsolePrinter console)
         {
-            string email = null;
+            _console = console;
+        }
+
+        public Credentials Execute(LoginAttempt? loginAttempt = null)
+        {
+            string? email = null;
             if (loginAttempt?.Email == null)
                 email = Prompt.GetString("Email: ");
             else
-                Console.WriteLine($"Email: {loginAttempt.Email}");
+                _console.WriteLine($"Email: {loginAttempt.Email}");
 
             var password = Prompt.GetPassword("Wachtwoord: ");
-            
-            Console.WriteLine();
-            
+
+            _console.WriteLine();
+
             return new Credentials
             {
                 Email = email,

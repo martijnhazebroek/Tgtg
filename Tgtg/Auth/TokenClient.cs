@@ -12,8 +12,8 @@ namespace Hazebroek.Tgtg.Auth
     internal sealed class TokenClient
     {
         private readonly HttpClient _httpClient;
-        private readonly UserContextRepository _userContextRepo;
         private readonly ILogger<TokenClient> _logger;
+        private readonly UserContextRepository _userContextRepo;
 
         public TokenClient(
             HttpClient httpClient,
@@ -35,7 +35,7 @@ namespace Hazebroek.Tgtg.Auth
                 throw new InvalidOperationException("AccessToken should not be null");
 
             _logger.LogInformation($"Refreshing tokens for {userContext.UserDisplayName}");
-            
+
             var request = new HttpRequestMessage(HttpMethod.Post, "api/auth/v1/token/refresh")
             {
                 Content = JsonResult.FromObject(new RefreshTokenRequest
@@ -63,8 +63,8 @@ namespace Hazebroek.Tgtg.Auth
             {
                 Content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("email", credentials.Email),
-                    new KeyValuePair<string, string>("password", credentials.Password),
+                    new KeyValuePair<string, string>("email", credentials?.Email!),
+                    new KeyValuePair<string, string>("password", credentials?.Password!),
                     new KeyValuePair<string, string>("device_id", "7412b321fa48d0a9"),
                     new KeyValuePair<string, string>("device_token", "1a065962-a28b-4b25-9a8f-742f1c24ac46"),
                     new KeyValuePair<string, string>("device_type", "2")
@@ -82,7 +82,7 @@ namespace Hazebroek.Tgtg.Auth
             var result = stream.ReadAndDeserializeFromJson<LoginResponse>();
 
             _userContextRepo.CurrentContext.UserDisplayName = result.DisplayName;
-            _userContextRepo.CurrentContext.Email = credentials.Email;
+            _userContextRepo.CurrentContext.Email = credentials?.Email;
             _userContextRepo.CurrentContext.AccessToken = result.AccessToken;
             _userContextRepo.CurrentContext.RefreshToken = result.RefreshToken;
             _userContextRepo.CurrentContext.UserId = result.UserId;

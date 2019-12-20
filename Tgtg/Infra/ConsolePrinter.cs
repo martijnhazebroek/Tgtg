@@ -1,6 +1,5 @@
 using System.Drawing;
 using Colorful;
-using Console = Colorful.Console;
 
 namespace Hazebroek.Tgtg.Infra
 {
@@ -23,16 +22,30 @@ namespace Hazebroek.Tgtg.Infra
 
     public class CliConsolePrinter : ConsolePrinter
     {
-        public override void WriteLine() => Console.WriteLine();
+        public override void WriteLine()
+        {
+            Console.WriteLine();
+        }
 
-        public override void WriteLine(string value) => Console.WriteLine(value);
+        public override void WriteLine(string value)
+        {
+            Console.WriteLine(value);
+        }
 
-        public override void WriteLineFormatted(string format, Color defaultColor, params Formatter[] args) =>
+        public override void WriteLineFormatted(string format, Color defaultColor, params Formatter[] args)
+        {
             Console.WriteLineFormatted(format, defaultColor, args);
+        }
 
-        public override void Write(string value) => Console.Write(value);
+        public override void Write(string value)
+        {
+            Console.Write(value);
+        }
 
-        public override void WriteLine(string value, in Color color) => System.Console.WriteLine(value, color);
+        public override void WriteLine(string value, in Color color)
+        {
+            System.Console.WriteLine(value, color);
+        }
     }
 
     public class WorkerConsolePrinter : ConsolePrinter
@@ -55,7 +68,6 @@ namespace Hazebroek.Tgtg.Infra
 
         public override void WriteLine(string value, in Color color)
         {
-            
         }
     }
 }

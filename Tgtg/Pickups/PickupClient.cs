@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -13,8 +12,8 @@ namespace Hazebroek.Tgtg.Pickups
     internal sealed class PickupClient
     {
         private readonly HttpClient _httpClient;
-        private readonly UserContextRepository _userContextRepo;
         private readonly ILogger<PickupClient> _logger;
+        private readonly UserContextRepository _userContextRepo;
 
         public PickupClient(
             HttpClient httpClient,

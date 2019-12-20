@@ -18,7 +18,7 @@ namespace Hazebroek.Tgtg.Auth
         {
             PathForContextFile(id).Delete();
         }
-        
+
         public Task Persist()
         {
             if (!CurrentContext.UserId.HasValue) throw new InvalidOperationException("UserId can not be null");
@@ -30,7 +30,7 @@ namespace Hazebroek.Tgtg.Auth
 
         public bool TryRestore(long userId, out UserContext userContext)
         {
-            userContext = null;
+            userContext = new UserContext();
 
             var pathForConfig = PathForContextFile(userId);
             if (!pathForConfig.Exists) return false;
@@ -48,8 +48,10 @@ namespace Hazebroek.Tgtg.Auth
             return true;
         }
 
-        private static FileInfo PathForContextFile(long userId) =>
-            new FileInfo(
+        private static FileInfo PathForContextFile(long userId)
+        {
+            return new FileInfo(
                 $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/tgtg/tgtg_{userId}.json");
+        }
     }
 }

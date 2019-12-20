@@ -11,14 +11,16 @@ namespace Hazebroek.Tgtg.Auth
         private static readonly DirectoryInfo TgtgRoot =
             new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/tgtg");
 
-        private UsersContext _usersContext;
         private readonly UserContextRepository _userContextRepo;
         private bool _restored;
+
+        private UsersContext _usersContext;
 
         public UsersContextRepository(
             UserContextRepository userContextRepo
         )
         {
+            _usersContext = new UsersContext();
             _userContextRepo = userContextRepo;
             JsonPath = new FileInfo(
                 $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/tgtg/tgtg.json");
@@ -29,7 +31,7 @@ namespace Hazebroek.Tgtg.Auth
         public void AddUser(in int userId)
         {
             AssureRestored();
-            _usersContext.UserIds.Add(userId);
+            _usersContext!.UserIds.Add(userId);
             Persist();
         }
 
@@ -44,11 +46,11 @@ namespace Hazebroek.Tgtg.Auth
                     return userContext;
                 });
         }
-        
+
         public void Remove(long id)
         {
             AssureRestored();
-            _usersContext.UserIds.Remove(id);
+            _usersContext!.UserIds.Remove(id);
             UserContextRepository.Remove(id);
             Persist();
         }
@@ -70,10 +72,9 @@ namespace Hazebroek.Tgtg.Auth
 
         public bool TryRestore(out UsersContext usersContext)
         {
-            usersContext = null;
+            usersContext = new UsersContext();
             if (!JsonPath.Exists)
             {
-                usersContext = new UsersContext();
                 return false;
             }
 
@@ -88,6 +89,5 @@ namespace Hazebroek.Tgtg.Auth
 
             return true;
         }
-        
     }
 }

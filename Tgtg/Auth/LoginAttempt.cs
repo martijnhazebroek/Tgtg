@@ -2,9 +2,9 @@ namespace Hazebroek.Tgtg.Auth
 {
     internal sealed class LoginAttempt
     {
-        public string Email { get; private set; }
+        public string? Email { get; private set; }
 
-        public string UserDisplayName { get; private set; }
+        public string? UserDisplayName { get; private set; }
 
         public LoginStatus Status { get; private set; }
 

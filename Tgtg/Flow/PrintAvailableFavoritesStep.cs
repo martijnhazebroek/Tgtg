@@ -29,14 +29,14 @@ namespace Hazebroek.Tgtg.Flow
                         _console.WriteLineFormatted(
                             "{0}: heeft {1} item(s) beschikbaar.",
                             Color.MediumPurple,
-                            new Formatter(row.Store.Name, Color.Aqua),
+                            new Formatter(row.Store!.Name!, Color.Aqua),
                             new Formatter(row.ItemsAvailable, Color.LawnGreen)
                         );
                     else
                         _console.WriteLineFormatted(
                             "{0}: heeft {1} items beschikbaar.",
                             Color.MediumPurple,
-                            new Formatter(row.Store.Name, Color.Aqua),
+                            new Formatter(row.Store!.Name!, Color.Aqua),
                             new Formatter("geen", Color.Red)
                         );
                 });

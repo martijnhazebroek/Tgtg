@@ -10,18 +10,19 @@ namespace Hazebroek.Tgtg.Flow
     internal sealed class LoopInitiatorStep
     {
         private readonly ILogger<LoopInitiatorStep> _logger;
+
         public LoopInitiatorStep(ILogger<LoopInitiatorStep> logger)
         {
             _logger = logger;
         }
-        
+
         public async Task Execute(IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
             var usersContextRepo = serviceProvider.GetRequiredService<UsersContextRepository>();
             if (usersContextRepo.TryRestore(out var usersContext))
             {
                 await serviceProvider.GetRequiredService<LoopUsersStep>()
-                    .Execute(usersContext.UserIds, serviceProvider, cancellationToken);
+                    .Execute(usersContext!.UserIds, serviceProvider, cancellationToken);
             }
             else
             {

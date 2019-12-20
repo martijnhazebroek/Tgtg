@@ -9,9 +9,9 @@ namespace Hazebroek.Tgtg.Flow
 {
     internal class LoopUsersStep
     {
-        private readonly List<Task> _tasks;
-        private readonly PrintUserCouldNotAutoLoginStep _printUserCouldNotAutoLoginStep;
         private readonly LoopKnownUserStep _loopKnownUserStep;
+        private readonly PrintUserCouldNotAutoLoginStep _printUserCouldNotAutoLoginStep;
+        private readonly List<Task> _tasks;
 
         public LoopUsersStep(
             PrintUserCouldNotAutoLoginStep printUserCouldNotAutoLoginStep,
@@ -31,13 +31,9 @@ namespace Hazebroek.Tgtg.Flow
                 var tryAutoLoginStep = serviceProvider.GetService<TryAutoLoginStep>();
                 var attempt = await tryAutoLoginStep.Execute(userId);
                 if (attempt.Status == LoginStatus.Reauthenticate)
-                {
                     _printUserCouldNotAutoLoginStep.Execute(attempt);
-                }
                 else
-                {
                     _tasks.Add(_loopKnownUserStep.Execute(userId, serviceProvider, cancellationToken));
-                }
             }
 
             await Task.WhenAll(_tasks);

@@ -15,7 +15,10 @@ namespace Hazebroek.Tgtg.Flow
         public void Execute()
         {
             var tokens = Prompt.GetString("IFTTT tokens (gescheiden door comma): ");
-            _notifier.RegisterTokens(tokens.Split(","));
+            if (tokens != null)
+            {
+                _notifier.RegisterTokens(tokens.Split(","));
+            }
         }
     }
 }

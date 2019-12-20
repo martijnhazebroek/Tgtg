@@ -6,13 +6,13 @@ namespace Hazebroek.Tgtg.Pickups
 {
     internal sealed class AvailableFavoritesResponse
     {
-        [JsonProperty("items")] public ICollection<StoreItem> StoreItems { get; set; }
+        [JsonProperty("items")] public ICollection<StoreItem>? StoreItems { get; set; }
     }
 
     internal class StoreItem
     {
-        [JsonProperty("item")] public Item Item { get; set; }
-        [JsonProperty("store")] public Store Store { get; set; }
+        [JsonProperty("item")] public Item? Item { get; set; }
+        [JsonProperty("store")] public Store? Store { get; set; }
         [JsonProperty("items_available")] public int ItemsAvailable { get; set; }
         [JsonProperty("sold_out_at")] public DateTime SoldOutAt { get; set; }
 
@@ -27,7 +27,7 @@ namespace Hazebroek.Tgtg.Pickups
 
     internal class Item
     {
-        [JsonProperty("item_id")] public string Id { get; set; }
+        [JsonProperty("item_id")] public string? Id { get; set; }
 
         public override string ToString()
         {

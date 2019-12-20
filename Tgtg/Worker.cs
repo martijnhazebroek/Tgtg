@@ -10,8 +10,8 @@ namespace Hazebroek.Tgtg
 {
     public sealed class Worker : BackgroundService
     {
-        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<Worker> _logger;
+        private readonly IServiceProvider _serviceProvider;
 
         public Worker(IServiceProvider serviceProvider)
         {
@@ -22,7 +22,7 @@ namespace Hazebroek.Tgtg
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Worker started at: {time}", DateTimeOffset.Now);
-            
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
@@ -30,10 +30,10 @@ namespace Hazebroek.Tgtg
                 await _serviceProvider
                     .GetRequiredService<LoopInitiatorStep>()
                     .Execute(_serviceProvider, stoppingToken);
-                
+
                 await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
             }
-            
+
             _logger.LogInformation("Worker stopped at: {time}", DateTimeOffset.Now);
         }
     }
