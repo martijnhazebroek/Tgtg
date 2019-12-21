@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Coravel;
 using Hazebroek.Tgtg.Auth;
 using Hazebroek.Tgtg.Flow;
 using Hazebroek.Tgtg.Infra;
@@ -20,8 +21,8 @@ namespace Hazebroek.Tgtg
 
         private static int Main(string[] args)
         {
-            ExecutionContext executionContext = args.Contains("--worker") 
-                ? (ExecutionContext)new WorkerExecutionContext() 
+            ExecutionContext executionContext = args.Contains("--worker")
+                ? (ExecutionContext) new WorkerExecutionContext()
                 : new CliExecutionContext();
 
             var builder = CreateHostBuilder(args, executionContext);
@@ -32,7 +33,13 @@ namespace Hazebroek.Tgtg
                 return cli.Execute(_serviceProvider!, args);
             }
 
-            builder.Build().Run();
+            var host = builder.Build();
+            host.Services.UseScheduler(scheduler =>
+                scheduler
+                    .Schedule<KeepAliveInvocable>()
+                    .EveryFifteenMinutes()
+            );
+            host.Run();
 
             return 0;
         }
@@ -56,6 +63,7 @@ namespace Hazebroek.Tgtg
                     {
                         services.AddTransient<ConsolePrinter, WorkerConsolePrinter>();
                         services.AddSingleton(executionContext);
+                        services.AddScheduler();
                     }
 
                     services
@@ -73,6 +81,7 @@ namespace Hazebroek.Tgtg
                         .AddTransient<LoginStep>()
                         .AddTransient<NotifyUsersStep>()
                         .AddTransient<NotifyAdminStep>()
+                        .AddTransient<KeepAliveInvocable>()
                         .AddTransient<TryAutoLoginStep>()
                         .AddTransient<PrintBannerStep>()
                         .AddTransient<PrintUsersStep>()
@@ -132,8 +141,8 @@ namespace Hazebroek.Tgtg
                     {
                         client.BaseAddress = new Uri("https://maker.ifttt.com/trigger/");
                         client.DefaultRequestHeaders.Clear();
-                    });   
-                    
+                    });
+
                     services.AddHttpClient<SlackNotifier>(client =>
                     {
                         client.BaseAddress = new Uri("https://hooks.slack.com/services/");

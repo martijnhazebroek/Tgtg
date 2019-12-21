@@ -25,10 +25,7 @@ namespace Hazebroek.Tgtg.Notify
         {
             var request = new HttpRequestMessage(HttpMethod.Post, $"TRYTHFEAH/BRYE5PC8L/g4Ai0TD9VSAMC4RwMo6KFGis")
             {
-                Content = JsonResult.FromObject(new Payload
-                {
-                    Text = "Alive and kicking!"
-                })
+                Content = JsonResult.FromObject(new Payload("Alive and kicking!"))
             };
 
             using var response =
@@ -42,7 +39,12 @@ namespace Hazebroek.Tgtg.Notify
 
         private class Payload
         {
-            [JsonProperty("text")] public string Text { get; set; }
+            public Payload(string text)
+            {
+                Text = text;
+            }
+            
+            [JsonProperty("text")] public string Text { get; }
         }
 
     }

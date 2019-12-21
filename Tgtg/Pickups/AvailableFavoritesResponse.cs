@@ -6,7 +6,7 @@ namespace Hazebroek.Tgtg.Pickups
 {
     internal sealed class AvailableFavoritesResponse
     {
-        [JsonProperty("items")] public ICollection<StoreItem> StoreItems { get; set; }
+        [JsonProperty("items")] public ICollection<StoreItem> StoreItems { get; } = new List<StoreItem>();
     }
 
     internal class StoreItem

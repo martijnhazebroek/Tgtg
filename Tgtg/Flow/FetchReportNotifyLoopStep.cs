@@ -8,20 +8,17 @@ namespace Hazebroek.Tgtg.Flow
     {
         private readonly FetchFavoritesStep _favoritesStep;
         private readonly NotifyUsersStep _notifyUsersStep;
-        private readonly NotifyAdminStep _notifyAdminStep;
         private readonly PrintAvailableFavoritesStep _printAvailableFavoritesStep;
 
         public FetchReportNotifyLoopStep(
             PrintAvailableFavoritesStep printAvailableFavoritesStep,
             FetchFavoritesStep favoritesStep,
-            NotifyUsersStep notifyUsersStep,
-            NotifyAdminStep notifyAdminStep
+            NotifyUsersStep notifyUsersStep
         )
         {
             _printAvailableFavoritesStep = printAvailableFavoritesStep;
             _favoritesStep = favoritesStep;
             _notifyUsersStep = notifyUsersStep;
-            _notifyAdminStep = notifyAdminStep;
         }
 
         public async Task Execute(CancellationToken cancellationToken)
@@ -33,13 +30,6 @@ namespace Hazebroek.Tgtg.Flow
                     var favorites = await _favoritesStep.Execute();
                     _printAvailableFavoritesStep.Execute(favorites);
                     _notifyUsersStep.Execute(favorites);
-                    
-                    // Send keep-alive messages
-                    Task.Run( () =>
-                    {
-                        Task.Delay(TimeSpan.FromMinutes(15), cancellationToken)
-                            .ContinueWith(t => _notifyAdminStep.Execute(), cancellationToken);
-                    }, cancellationToken);
 
                     // Wait 2 minutes to start the next round.
                     await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken);
