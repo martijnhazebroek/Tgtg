@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -59,7 +60,20 @@ namespace Hazebroek.Tgtg.Pickups
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, $"Error while fetching favorites for {userContext.UserDisplayName}");
+                _logger.LogError(ex,
+                    $"HttpRequestException while fetching favorites for {userContext.UserDisplayName}");
+
+                return await Task.FromResult(new AvailableFavoritesResponse());
+            }
+            catch (IOException ex)
+            {
+                _logger.LogError(ex, $"IOException while fetching favorites for {userContext.UserDisplayName}");
+
+                return await Task.FromResult(new AvailableFavoritesResponse());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Exception while fetching favorites for {userContext.UserDisplayName}");
 
                 return await Task.FromResult(new AvailableFavoritesResponse());
             }
