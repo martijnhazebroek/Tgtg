@@ -37,7 +37,7 @@ namespace Hazebroek.Tgtg.Flow
                     // Send keep-alive messages
                     Task.Run( () =>
                     {
-                        Task.Delay(TimeSpan.FromMinutes(5), cancellationToken)
+                        Task.Delay(TimeSpan.FromMinutes(15), cancellationToken)
                             .ContinueWith(t => _notifyAdminStep.Execute(), cancellationToken);
                     }, cancellationToken);
 

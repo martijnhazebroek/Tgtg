@@ -21,7 +21,7 @@ namespace Hazebroek.Tgtg.Notify
             _logger = logger;
         }
 
-        public async Task Notify()
+        public async Task SendKeepAlive()
         {
             var request = new HttpRequestMessage(HttpMethod.Post, $"TRYTHFEAH/BRYE5PC8L/g4Ai0TD9VSAMC4RwMo6KFGis")
             {

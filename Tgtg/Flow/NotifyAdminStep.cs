@@ -12,9 +12,6 @@ namespace Hazebroek.Tgtg.Flow
             _notifier = notifier;
         }
 
-        public async Task Execute()
-        {
-            await _notifier.Notify();
-        }
+        public async Task Execute() => await _notifier.SendKeepAlive();
     }
 }
