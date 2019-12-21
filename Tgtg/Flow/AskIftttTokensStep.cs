@@ -5,9 +5,9 @@ namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class AskIftttTokensStep
     {
-        private readonly TgtgNotifier _notifier;
+        private readonly IftttNotifier _notifier;
 
-        public AskIftttTokensStep(TgtgNotifier notifier)
+        public AskIftttTokensStep(IftttNotifier notifier)
         {
             _notifier = notifier;
         }

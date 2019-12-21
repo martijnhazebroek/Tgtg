@@ -6,9 +6,9 @@ namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class NotifyUsersStep
     {
-        private readonly TgtgNotifier _notifier;
+        private readonly IftttNotifier _notifier;
 
-        public NotifyUsersStep(TgtgNotifier notifier)
+        public NotifyUsersStep(IftttNotifier notifier)
         {
             _notifier = notifier;
         }

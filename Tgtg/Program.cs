@@ -72,6 +72,7 @@ namespace Hazebroek.Tgtg
                         .AddTransient<FetchReportNotifyLoopStep>()
                         .AddTransient<LoginStep>()
                         .AddTransient<NotifyUsersStep>()
+                        .AddTransient<NotifyAdminStep>()
                         .AddTransient<TryAutoLoginStep>()
                         .AddTransient<PrintBannerStep>()
                         .AddTransient<PrintUsersStep>()
@@ -127,9 +128,15 @@ namespace Hazebroek.Tgtg
                             return handler;
                         });
 
-                    services.AddHttpClient<TgtgNotifier>(client =>
+                    services.AddHttpClient<IftttNotifier>(client =>
                     {
                         client.BaseAddress = new Uri("https://maker.ifttt.com/trigger/");
+                        client.DefaultRequestHeaders.Clear();
+                    });   
+                    
+                    services.AddHttpClient<SlackNotifier>(client =>
+                    {
+                        client.BaseAddress = new Uri("https://hooks.slack.com/services/");
                         client.DefaultRequestHeaders.Clear();
                     });
 

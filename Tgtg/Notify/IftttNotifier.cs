@@ -8,20 +8,20 @@ using Microsoft.Extensions.Logging;
 
 namespace Hazebroek.Tgtg.Notify
 {
-    internal class TgtgNotifier
+    internal sealed class IftttNotifier
     {
         private readonly HttpClient _httpClient;
-        private readonly ILogger<TgtgNotifier> _logger;
+        private readonly ILogger<IftttNotifier> _logger;
 
         private readonly Dictionary<string, Collection<string>> _notificationSent =
             new Dictionary<string, Collection<string>>();
 
         private readonly UserContextRepository _userContextRepo;
 
-        public TgtgNotifier(
+        public IftttNotifier(
             HttpClient httpClient,
             UserContextRepository userContextRepo,
-            ILogger<TgtgNotifier> logger
+            ILogger<IftttNotifier> logger
         )
         {
             _httpClient = httpClient;
