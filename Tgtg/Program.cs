@@ -35,10 +35,11 @@ namespace Hazebroek.Tgtg
 
             var host = builder.Build();
             host.Services.UseScheduler(scheduler =>
+            {
                 scheduler
                     .Schedule<KeepAliveInvocable>()
-                    .EveryFifteenMinutes()
-            );
+                    .Hourly();
+            });
             host.Run();
 
             return 0;
@@ -81,7 +82,6 @@ namespace Hazebroek.Tgtg
                         .AddTransient<LoginStep>()
                         .AddTransient<NotifyUsersStep>()
                         .AddTransient<NotifyAdminStep>()
-                        .AddTransient<KeepAliveInvocable>()
                         .AddTransient<TryAutoLoginStep>()
                         .AddTransient<PrintBannerStep>()
                         .AddTransient<PrintUsersStep>()
@@ -89,6 +89,7 @@ namespace Hazebroek.Tgtg
                         .AddTransient<PrintUserCouldNotAutoLoginStep>()
                         .AddTransient<PrintDebugStep>()
                         .AddTransient<PrintWelcomeUserStep>()
+                        .AddTransient<KeepAliveInvocable>()
                         .AddScoped<UserContextRepository>()
                         .AddScoped<UserContext>()
                         .AddScoped<UsersContextRepository>();
@@ -105,14 +106,11 @@ namespace Hazebroek.Tgtg
                             );
                             client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
                         })
-                        .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+                        .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
                         {
-                            var handler = new HttpClientHandler
-                            {
-                                AutomaticDecompression = DecompressionMethods.GZip,
-                                UseProxy = true
-                            };
-                            return handler;
+                            PooledConnectionIdleTimeout = TimeSpan.FromSeconds(15),
+                            PooledConnectionLifetime = TimeSpan.FromSeconds(60),
+                            AutomaticDecompression = DecompressionMethods.GZip
                         });
 
                     services.AddHttpClient<TokenClient>(client =>
@@ -127,14 +125,11 @@ namespace Hazebroek.Tgtg
                             );
                             client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
                         })
-                        .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+                        .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
                         {
-                            var handler = new HttpClientHandler
-                            {
-                                AutomaticDecompression = DecompressionMethods.GZip,
-                                UseProxy = true
-                            };
-                            return handler;
+                            PooledConnectionIdleTimeout = TimeSpan.FromSeconds(15),
+                            PooledConnectionLifetime = TimeSpan.FromSeconds(60),
+                            AutomaticDecompression = DecompressionMethods.GZip
                         });
 
                     services.AddHttpClient<IftttNotifier>(client =>

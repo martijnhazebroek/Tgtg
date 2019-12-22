@@ -1,0 +1,31 @@
+{
+  "profiles": {
+    "Tgtg": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "DebugInfo": {
+      "commandName": "Project",
+      "commandLineArgs": "-d",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "AddUser": {
+      "commandName": "Project",
+      "commandLineArgs": "-a",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Worker": {
+      "commandName": "Project",
+      "commandLineArgs": "--worker",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

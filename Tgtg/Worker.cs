@@ -23,13 +23,12 @@ namespace Hazebroek.Tgtg
         {
             _logger.LogInformation("Worker started at: {time}", DateTimeOffset.Now);
 
+            var loop = _serviceProvider.GetRequiredService<LoopInitiatorStep>();
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
-                await _serviceProvider
-                    .GetRequiredService<LoopInitiatorStep>()
-                    .Execute(_serviceProvider, stoppingToken);
+                await loop.Execute(_serviceProvider, stoppingToken);
 
                 await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
             }
