@@ -19,9 +19,9 @@ namespace Hazebroek.Tgtg.Flow
 
         public void Execute(AvailableFavoritesResponse favorites)
         {
-            
             favorites.StoreItems
                 .Where(si => si.HasItems)
+                .Where(si => !_userContextRepo.CurrentContext.IsNotificationSent(si.Item.Id))
                 .ToList()
                 .ForEach(async si =>
                 {
@@ -33,6 +33,9 @@ namespace Hazebroek.Tgtg.Flow
                         si.ItemsAvailable,
                         si.Item!.Picture!.Uri!
                     ));
+
+                    _userContextRepo.CurrentContext.DidSentNotification(si.Item.Id);
+                    await _userContextRepo.Persist();
                 });
         }
     }
