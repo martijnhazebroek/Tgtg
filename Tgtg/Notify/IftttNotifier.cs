@@ -29,13 +29,13 @@ namespace Hazebroek.Tgtg.Notify
             _logger = logger;
         }
 
-        public void Notify(string itemId, string store, int numberOfItems)
+        public void Notify(ItemNotification notification)
         {
             _userContextRepo.CurrentContext.IftttTokens
                 .Where(token =>
                 {
                     if (!_notificationSent.ContainsKey(token)) _notificationSent.Add(token, new Collection<string>());
-                    return !_notificationSent[token].Contains(itemId);
+                    return !_notificationSent[token].Contains(notification.ItemId);
                 })
                 .ToList()
                 .ForEach(async token =>
@@ -44,8 +44,9 @@ namespace Hazebroek.Tgtg.Notify
                     {
                         Content = new FormUrlEncodedContent(new[]
                         {
-                            new KeyValuePair<string, string>("value1", store),
-                            new KeyValuePair<string, string>("value2", numberOfItems.ToString())
+                            new KeyValuePair<string, string>("value1", notification.StoreName),
+                            new KeyValuePair<string, string>("value2", notification.Quantity.ToString()),
+                            new KeyValuePair<string, string>("value3", notification.StorePicture.AbsoluteUri),
                         })
                     };
 
@@ -58,9 +59,9 @@ namespace Hazebroek.Tgtg.Notify
                     response.EnsureSuccessStatusCode();
 
                     _logger.LogInformation(
-                        $"Successfully sent push message for {_userContextRepo.CurrentContext.UserDisplayName} regarding {store}");
+                        $"Successfully sent push message for {_userContextRepo.CurrentContext.UserDisplayName} regarding {notification.StoreName}");
 
-                    _notificationSent[token].Add(itemId);
+                    _notificationSent[token].Add(notification.ItemId);
                 });
         }
 

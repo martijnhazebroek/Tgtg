@@ -20,7 +20,13 @@ namespace Hazebroek.Tgtg.Flow
                 .ToList()
                 .ForEach(si =>
                 {
-                    _notifier.Notify(si.Item!.Id!, si.Store!.Name!, si.ItemsAvailable);
+                    _notifier.Notify(new ItemNotification
+                    (
+                        si.Item!.Id!,
+                        si.Store!.Name!,
+                        si.ItemsAvailable,
+                        si.Item!.Picture!.Uri!
+                    ));
                 });
         }
     }
