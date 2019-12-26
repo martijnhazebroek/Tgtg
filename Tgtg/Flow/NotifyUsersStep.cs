@@ -1,27 +1,33 @@
 using System.Linq;
+using Hazebroek.Tgtg.Auth;
 using Hazebroek.Tgtg.Notify;
 using Hazebroek.Tgtg.Pickups;
+using MediatR;
 
 namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class NotifyUsersStep
     {
-        private readonly IftttNotifier _notifier;
+        private readonly IMediator _mediator;
+        private readonly UserContextRepository _userContextRepo;
 
-        public NotifyUsersStep(IftttNotifier notifier)
+        public NotifyUsersStep(IMediator mediator, UserContextRepository userContextRepo)
         {
-            _notifier = notifier;
+            _mediator = mediator;
+            _userContextRepo = userContextRepo;
         }
 
         public void Execute(AvailableFavoritesResponse favorites)
         {
+            
             favorites.StoreItems
                 .Where(si => si.HasItems)
                 .ToList()
-                .ForEach(si =>
+                .ForEach(async si =>
                 {
-                    _notifier.Notify(new ItemNotification
+                    await _mediator.Publish(new ItemNotification
                     (
+                        _userContextRepo!.CurrentContext!.UserDisplayName!,
                         si.Item!.Id!,
                         si.Store!.Name!,
                         si.ItemsAvailable,

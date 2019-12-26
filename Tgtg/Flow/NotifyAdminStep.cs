@@ -1,17 +1,18 @@
 using System.Threading.Tasks;
 using Hazebroek.Tgtg.Notify;
+using MediatR;
 
 namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class NotifyAdminStep
     {
-        private readonly SlackNotifier _notifier;
+        private readonly SlackKeepAliveNotifier _keepAliveNotifier;
 
-        public NotifyAdminStep(SlackNotifier notifier)
+        public NotifyAdminStep(SlackKeepAliveNotifier keepAliveNotifier)
         {
-            _notifier = notifier;
+            _keepAliveNotifier = keepAliveNotifier;
         }
 
-        public async Task Execute() => await _notifier.SendKeepAlive();
+        public async Task Execute() => await _keepAliveNotifier.SendKeepAlive();
     }
 }

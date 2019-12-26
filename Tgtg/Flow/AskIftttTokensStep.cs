@@ -5,11 +5,11 @@ namespace Hazebroek.Tgtg.Flow
 {
     internal sealed class AskIftttTokensStep
     {
-        private readonly IftttNotifier _notifier;
+        private readonly IftttRepository _iftttRepo;
 
-        public AskIftttTokensStep(IftttNotifier notifier)
+        public AskIftttTokensStep(IftttRepository iftttRepo)
         {
-            _notifier = notifier;
+            _iftttRepo = iftttRepo;
         }
 
         public void Execute()
@@ -17,7 +17,7 @@ namespace Hazebroek.Tgtg.Flow
             var tokens = Prompt.GetString("IFTTT tokens (gescheiden door comma): ");
             if (tokens != null)
             {
-                _notifier.RegisterTokens(tokens.Split(","));
+                _iftttRepo.RegisterTokens(tokens.Split(","));
             }
         }
     }

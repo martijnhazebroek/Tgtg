@@ -3,12 +3,14 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using Coravel;
 using Hazebroek.Tgtg.Auth;
 using Hazebroek.Tgtg.Flow;
 using Hazebroek.Tgtg.Infra;
 using Hazebroek.Tgtg.Notify;
 using Hazebroek.Tgtg.Pickups;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -90,6 +92,8 @@ namespace Hazebroek.Tgtg
                         .AddTransient<PrintDebugStep>()
                         .AddTransient<PrintWelcomeUserStep>()
                         .AddTransient<KeepAliveInvocable>()
+                        .AddTransient<IftttRepository>()
+                        .AddTransient<SlackKeepAliveNotifier>()
                         .AddScoped<UserContextRepository>()
                         .AddScoped<UserContext>()
                         .AddScoped<UsersContextRepository>();
@@ -132,17 +136,19 @@ namespace Hazebroek.Tgtg
                             AutomaticDecompression = DecompressionMethods.GZip
                         });
 
-                    services.AddHttpClient<IftttNotifier>(client =>
+                    services.AddHttpClient<IftttHttpClient>(client =>
                     {
                         client.BaseAddress = new Uri("https://maker.ifttt.com/trigger/");
                         client.DefaultRequestHeaders.Clear();
                     });
 
-                    services.AddHttpClient<SlackNotifier>(client =>
+                    services.AddHttpClient<SlackHttpClient>(client =>
                     {
                         client.BaseAddress = new Uri("https://hooks.slack.com/services/");
                         client.DefaultRequestHeaders.Clear();
                     });
+
+                    services.AddMediatR(Assembly.GetExecutingAssembly());
 
                     if (!executionContext.HasPrompt)
                         services.AddHostedService(factory =>
@@ -150,6 +156,8 @@ namespace Hazebroek.Tgtg
                         );
                     else
                         _serviceProvider = services.BuildServiceProvider();
+                    
+                    
                 });
         }
     }
