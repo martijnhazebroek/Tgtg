@@ -1,5 +1,6 @@
 using System.Linq;
 using Hazebroek.Tgtg.Auth;
+using Hazebroek.Tgtg.Infra;
 using Hazebroek.Tgtg.Notify;
 using Hazebroek.Tgtg.Pickups;
 using MediatR;
@@ -21,7 +22,9 @@ namespace Hazebroek.Tgtg.Flow
         {
             favorites.StoreItems
                 .Where(si => si.HasItems)
-                .Where(si => !_userContextRepo.CurrentContext.IsNotificationSent(si.Item.Id))
+                .Where(si =>
+                    !_userContextRepo.CurrentContext.IsNotificationSentPast(si.Item.Id, 1.Hours())
+                )
                 .ToList()
                 .ForEach(async si =>
                 {

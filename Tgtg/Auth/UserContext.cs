@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Hazebroek.Tgtg.Infra;
 using Newtonsoft.Json;
 
 namespace Hazebroek.Tgtg.Auth
@@ -17,11 +18,21 @@ namespace Hazebroek.Tgtg.Auth
         
         [JsonProperty("push_sent_items")] public ICollection<PushNotificationSent> PushNotificationsSent = new Collection<PushNotificationSent>();
         
-        public bool IsNotificationSent(string id) => PushNotificationsSent.Any(item => item.ItemId == id);
+        public bool IsNotificationSentPast(string id, TimeSpan hours) => 
+            PushNotificationsSent
+                .Any(item => item.ItemId == id && item.DateTime > hours.Ago());
 
         public void DidSentNotification(string itemId)
         {
-            PushNotificationsSent.Add(new PushNotificationSent{ItemId = itemId});
+            var itemInCache = PushNotificationsSent.SingleOrDefault(item => item.ItemId == itemId);
+            if (itemInCache != null)
+            {
+                itemInCache.DateTime = DateTime.Now;
+            }
+            else
+            {
+                PushNotificationsSent.Add(new PushNotificationSent{ItemId = itemId});    
+            }
         }
     }
 
