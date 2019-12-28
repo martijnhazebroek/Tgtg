@@ -2,16 +2,22 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Hazebroek.Tgtg.Notify
 {
     internal sealed class IftttHttpClient
     {
         private readonly HttpClient _httpClient;
+        private readonly ILogger<IftttHttpClient> _logger;
 
-        public IftttHttpClient(HttpClient httpClient)
+        public IftttHttpClient(
+            HttpClient httpClient, 
+            ILogger<IftttHttpClient> logger
+        )
         {
             _httpClient = httpClient;
+            _logger = logger;
         }
 
         public async Task SendToWebHook(IftttRequest request, CancellationToken cancellationToken)
@@ -32,7 +38,11 @@ namespace Hazebroek.Tgtg.Notify
                 );
 
             var _ = await response.Content.ReadAsStreamAsync();
-            response.EnsureSuccessStatusCode();
+            // response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError($"Unsuccessful response: {response.StatusCode}");
+            }
         }
     }
 }

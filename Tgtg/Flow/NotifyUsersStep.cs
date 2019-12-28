@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using Hazebroek.Tgtg.Auth;
 using Hazebroek.Tgtg.Infra;
 using Hazebroek.Tgtg.Notify;
@@ -18,16 +19,18 @@ namespace Hazebroek.Tgtg.Flow
             _userContextRepo = userContextRepo;
         }
 
-        public void Execute(AvailableFavoritesResponse favorites)
+        public async Task Execute(AvailableFavoritesResponse favorites)
         {
             favorites.StoreItems
                 .Where(si => si.HasItems)
                 .Where(si =>
-                    !_userContextRepo.CurrentContext.IsNotificationSentPast(si.Item.Id, 1.Hours())
+                    !_userContextRepo.CurrentContext!.IsNotificationSentPast(si.Item!.Id!, 4.Hours())
                 )
                 .ToList()
                 .ForEach(async si =>
                 {
+                    _userContextRepo.CurrentContext.DidSentNotification(si.Item!.Id!);
+
                     await _mediator.Publish(new ItemNotification
                     (
                         _userContextRepo!.CurrentContext!.UserDisplayName!,
@@ -37,9 +40,9 @@ namespace Hazebroek.Tgtg.Flow
                         si.Item!.Picture!.Uri!
                     ));
 
-                    _userContextRepo.CurrentContext.DidSentNotification(si.Item.Id);
-                    await _userContextRepo.Persist();
                 });
+            
+            await _userContextRepo.Persist();
         }
     }
 }

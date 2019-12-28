@@ -29,7 +29,7 @@ namespace Hazebroek.Tgtg.Flow
                 {
                     var favorites = await _favoritesStep.Execute();
                     _printAvailableFavoritesStep.Execute(favorites);
-                    _notifyUsersStep.Execute(favorites);
+                    await _notifyUsersStep.Execute(favorites);
 
                     // Wait 2 minutes to start the next round.
                     await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken);

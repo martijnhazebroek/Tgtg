@@ -39,7 +39,7 @@ namespace Hazebroek.Tgtg.Auth
     public sealed class PushNotificationSent
     {
         [JsonProperty("item_id")] 
-        public string ItemId { get; set; }
+        public string? ItemId { get; set; }
         
         [JsonProperty("date_time")] 
         public DateTime DateTime { get; set; } = DateTime.Now;
