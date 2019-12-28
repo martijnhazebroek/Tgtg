@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Hazebroek.Tgtg.Auth;
-using Hazebroek.Tgtg.Infra;
 using Hazebroek.Tgtg.Notify;
 using Hazebroek.Tgtg.Pickups;
 using MediatR;
@@ -24,12 +23,15 @@ namespace Hazebroek.Tgtg.Flow
             favorites.StoreItems
                 .Where(si => si.HasItems)
                 .Where(si =>
-                    !_userContextRepo.CurrentContext!.IsNotificationSentPast(si.Item!.Id!, 4.Hours())
+                    !_userContextRepo.CurrentContext!.IsNotificationSent(
+                        si.Item!.Id!,
+                        si.PurchaseEnd!
+                    )
                 )
                 .ToList()
                 .ForEach(async si =>
                 {
-                    _userContextRepo.CurrentContext.DidSentNotification(si.Item!.Id!);
+                    _userContextRepo.CurrentContext.DidSentNotification(si.Item!.Id!, si.PurchaseEnd!);
 
                     await _mediator.Publish(new ItemNotification
                     (
@@ -39,9 +41,8 @@ namespace Hazebroek.Tgtg.Flow
                         si.ItemsAvailable,
                         si.Item!.Picture!.Uri!
                     ));
-
                 });
-            
+
             await _userContextRepo.Persist();
         }
     }

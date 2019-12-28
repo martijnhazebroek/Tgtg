@@ -15,33 +15,41 @@ namespace Hazebroek.Tgtg.Auth
         [JsonProperty("email")] public string? Email { get; set; }
         [JsonProperty("access_token")] public string? AccessToken { get; set; }
         [JsonProperty("refresh_token")] public string? RefreshToken { get; set; }
-        
-        [JsonProperty("push_sent_items")] public ICollection<PushNotificationSent> PushNotificationsSent = new Collection<PushNotificationSent>();
-        
-        public bool IsNotificationSentPast(string id, TimeSpan hours) => 
-            PushNotificationsSent
-                .Any(item => item.ItemId == id && item.DateTime > hours.Ago());
 
-        public void DidSentNotification(string itemId)
+        [JsonProperty("push_sent_items")]
+        public ICollection<PushNotificationSent> PushNotificationsSent = new Collection<PushNotificationSent>();
+
+        public bool IsNotificationSent(string id, DateTime purchaseEnd) =>
+            PushNotificationsSent
+                .Any(item =>
+                    item.ItemId == id && item.PurchaseEnd == purchaseEnd
+                );
+        
+        public void DidSentNotification(string itemId, DateTime purchaseEnd)
         {
             var itemInCache = PushNotificationsSent.SingleOrDefault(item => item.ItemId == itemId);
             if (itemInCache != null)
             {
                 itemInCache.DateTime = DateTime.Now;
+                itemInCache.PurchaseEnd = purchaseEnd;
             }
             else
             {
-                PushNotificationsSent.Add(new PushNotificationSent{ItemId = itemId});    
+                PushNotificationsSent.Add(new PushNotificationSent
+                {
+                    ItemId = itemId,
+                    PurchaseEnd = purchaseEnd
+                });
             }
         }
     }
 
     public sealed class PushNotificationSent
     {
-        [JsonProperty("item_id")] 
-        public string? ItemId { get; set; }
+        [JsonProperty("item_id")] public string? ItemId { get; set; }
+
+        [JsonProperty("date_time")] public DateTime DateTime { get; set; } = DateTime.Now;
         
-        [JsonProperty("date_time")] 
-        public DateTime DateTime { get; set; } = DateTime.Now;
+        [JsonProperty("purchase_end")] public DateTime? PurchaseEnd { get; set; }
     }
 }
