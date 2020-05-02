@@ -16,7 +16,7 @@ namespace Hazebroek.Tgtg.Notify
         public async Task Handle(ItemNotification notification, CancellationToken cancellationToken)
         {
             await _slack.SendNotification(
-                new SlackNotification($"Sent push message to {notification.UserDisplayName} regarding {notification.StoreName} (quantity: {notification.Quantity})"));
+                new SlackNotification($"Sent push message to {notification.UserDisplayName} regarding {notification.StoreName}"));
         }
     }
 }
