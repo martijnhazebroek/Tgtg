@@ -30,7 +30,7 @@ namespace Hazebroek.Tgtg
 
                 await loop.Execute(_serviceProvider, stoppingToken);
 
-                await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
 
             _logger.LogInformation("Worker stopped at: {time}", DateTimeOffset.Now);
