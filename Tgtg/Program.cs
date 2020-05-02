@@ -41,6 +41,22 @@ namespace Hazebroek.Tgtg
                 scheduler
                     .Schedule<KeepAliveInvocable>()
                     .Hourly();
+                scheduler
+                    .Schedule<LoopInitiatorInvocable>()
+                    .HourlyAt(0);
+                scheduler
+                    .Schedule<LoopInitiatorInvocable>()
+                    .HourlyAt(15);
+                scheduler
+                    .Schedule<LoopInitiatorInvocable>()
+                    .HourlyAt(30);
+                scheduler
+                    .Schedule<LoopInitiatorInvocable>()
+                    .HourlyAt(45);
+            }).OnError(ex =>
+            {
+                var logger = host.Services.GetService<ILogger<Program>>();
+                logger.LogError(ex, ex.Message);
             });
             host.Run();
 
@@ -92,6 +108,7 @@ namespace Hazebroek.Tgtg
                         .AddTransient<PrintDebugStep>()
                         .AddTransient<PrintWelcomeUserStep>()
                         .AddTransient<KeepAliveInvocable>()
+                        .AddTransient<LoopInitiatorInvocable>()
                         .AddTransient<IftttRepository>()
                         .AddTransient<SlackKeepAliveNotifier>()
                         .AddScoped<UserContextRepository>()
@@ -156,8 +173,6 @@ namespace Hazebroek.Tgtg
                         );
                     else
                         _serviceProvider = services.BuildServiceProvider();
-                    
-                    
                 });
         }
     }
